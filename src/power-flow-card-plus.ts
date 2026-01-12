@@ -571,9 +571,6 @@ export class PowerFlowCardPlus extends LitElement {
     const individualFieldRightTop = getTopRightIndividual(sortedIndividualObjects);
     const individualFieldRightBottom = getBottomRightIndividual(sortedIndividualObjects);
 
-    const visibleIndividuals = sortedIndividualObjects.filter((individual) => individual.has);
-    const extraIndividuals = visibleIndividuals.slice(4);
-
     return html`
       <ha-card
         .header=${this._config.title}
@@ -585,7 +582,31 @@ export class PowerFlowCardPlus extends LitElement {
           id="power-flow-card-plus"
           style=${this._config.style_card_content ? this._config.style_card_content : ""}
         >
-          ${solar.has || individualObjs?.some((individual) => individual?.has) || nonFossil.hasPercentage
+          ${individualFieldLeftTop || individualFieldRightTop
+            ? html`<div class="row top-individuals-row">
+                ${individualFieldLeftTop
+                  ? individualLeftTopElement(this, this._config, {
+                      individualObj: individualFieldLeftTop,
+                      displayState: getIndividualDisplayState(individualFieldLeftTop),
+                      newDur,
+                      templatesObj,
+                    })
+                  : html`<div class="spacer"></div>`}
+                <div class="spacer"></div>
+                ${checkHasRightIndividual(individualObjs)
+                  ? individualRightTopElement(this, this._config, {
+                      displayState: getIndividualDisplayState(individualFieldRightTop),
+                      individualObj: individualFieldRightTop,
+                      newDur,
+                      templatesObj,
+                      battery,
+                      individualObjs,
+                    })
+                  : html`<div class="spacer"></div>`}
+              </div>`
+            : html``}
+          ${(solar.has || nonFossil.hasPercentage) &&
+          !entities.home?.hide
             ? html`<div class="row">
                 ${nonFossilElement(this, this._config, {
                   entities,
@@ -600,27 +621,8 @@ export class PowerFlowCardPlus extends LitElement {
                       solar,
                       templatesObj,
                     })
-                  : individualObjs?.some((individual) => individual?.has)
-                  ? html`<div class="spacer"></div>`
-                  : ""}
-                ${individualFieldLeftTop
-                  ? individualLeftTopElement(this, this._config, {
-                      individualObj: individualFieldLeftTop,
-                      displayState: getIndividualDisplayState(individualFieldLeftTop),
-                      newDur,
-                      templatesObj,
-                    })
                   : html`<div class="spacer"></div>`}
-                ${checkHasRightIndividual(individualObjs)
-                  ? individualRightTopElement(this, this._config, {
-                      displayState: getIndividualDisplayState(individualFieldRightTop),
-                      individualObj: individualFieldRightTop,
-                      newDur,
-                      templatesObj,
-                      battery,
-                      individualObjs,
-                    })
-                  : html``}
+                <div class="spacer"></div>
               </div>`
             : html``}
           <div class="row">
@@ -650,10 +652,15 @@ export class PowerFlowCardPlus extends LitElement {
               : html`<div class="spacer"></div>`}
             ${checkHasRightIndividual(individualObjs) ? html` <div class="spacer"></div>` : html``}
           </div>
-          ${battery.has || checkHasBottomIndividual(individualObjs)
+          ${battery.has
             ? html`<div class="row">
                 <div class="spacer"></div>
-                ${battery.has ? batteryElement(this, this._config, { battery, entities }) : html`<div class="spacer"></div>`}
+                ${batteryElement(this, this._config, { battery, entities })}
+                <div class="spacer"></div>
+              </div>`
+            : html``}
+          ${checkHasBottomIndividual(individualObjs)
+            ? html`<div class="row bottom-individuals-row">
                 ${individualFieldLeftBottom
                   ? individualLeftBottomElement(this, this._config, {
                       displayState: getIndividualDisplayState(individualFieldLeftBottom),
@@ -662,6 +669,7 @@ export class PowerFlowCardPlus extends LitElement {
                       templatesObj,
                     })
                   : html`<div class="spacer"></div>`}
+                <div class="spacer"></div>
                 ${checkHasRightIndividual(individualObjs)
                   ? individualRightBottomElement(this, this._config, {
                       displayState: getIndividualDisplayState(individualFieldRightBottom),
@@ -671,32 +679,7 @@ export class PowerFlowCardPlus extends LitElement {
                       battery,
                       individualObjs,
                     })
-                  : html``}
-              </div>`
-            : html`<div class="spacer"></div>`}
-          ${extraIndividuals.length
-            ? html`<div class="row extra-individuals-row">
-                <div class="extra-individuals-column">
-                  ${extraIndividuals.map((individual, index) =>
-                    index % 2 === 0
-                      ? html`<div class="extra-individual">
-                          <span class="label">${individual.name}</span>
-                          <span class="extra-individual-value">${getIndividualDisplayState(individual)}</span>
-                        </div>`
-                      : ""
-                  )}
-                </div>
-                <div class="spacer"></div>
-                <div class="extra-individuals-column">
-                  ${extraIndividuals.map((individual, index) =>
-                    index % 2 === 1
-                      ? html`<div class="extra-individual">
-                          <span class="label">${individual.name}</span>
-                          <span class="extra-individual-value">${getIndividualDisplayState(individual)}</span>
-                        </div>`
-                      : ""
-                  )}
-                </div>
+                  : html`<div class="spacer"></div>`}
               </div>`
             : html``}
           ${flowElement(this._config, {

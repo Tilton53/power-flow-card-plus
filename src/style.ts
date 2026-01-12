@@ -166,35 +166,34 @@ export const styles = css`
     margin: 0 auto;
   }
 
-  .extra-individuals-row {
+  /* dedicated spacing for individual rows */
+  .top-individuals-row {
+    margin-bottom: 8px;
+  }
+
+  .bottom-individuals-row {
     margin-top: 8px;
-    align-items: flex-start;
   }
 
+  /* legacy extra-individual styles no longer used */
+  .extra-individuals-row {
+    display: none;
+  }
   .extra-individuals-column {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 140px;
-    overflow-y: auto;
-    padding: 0 2px;
+    display: none;
   }
-
   .extra-individual {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: none;
   }
-
   .extra-individual-value {
-    font-size: 12px;
-    color: var(--secondary-text-color);
+    display: none;
   }
 
   .circle-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
   }
   .circle-container.solar {
     height: 130px;
@@ -216,11 +215,34 @@ export const styles = css`
   }
 
   .downstream-list {
-    margin-top: 4px;
+    position: absolute;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    z-index: 3;
   }
+
+  /* Position downstream clusters around their parent individual */
+  .circle-container.individual-top:not(.individual-right) .downstream-list {
+    left: -90px;
+    top: -10px;
+  }
+
+  .circle-container.individual-bottom:not(.individual-right) .downstream-list {
+    left: -90px;
+    bottom: -10px;
+  }
+
+  .circle-container.individual-right.individual-top .downstream-list {
+    right: -90px;
+    top: -10px;
+  }
+
+  .circle-container.individual-right.individual-bottom .downstream-list {
+    right: -90px;
+    bottom: -10px;
+  }
+
   .downstream-item {
     display: flex;
     flex-direction: column;
