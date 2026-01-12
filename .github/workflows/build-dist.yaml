@@ -1,0 +1,53 @@
+name: Build and Commit Dist
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "dist/**"
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache pnpm modules
+        id: cache-modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            **/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'rollup.config.js') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install Packages
+        if: steps.cache-modules.outputs.cache-hit != 'true'
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Commit dist bundle if changed
+        run: |
+          if git status --porcelain | grep -q "dist/power-flow-card-plus.js"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -f dist/power-flow-card-plus.js
+            git commit -m "chore: build dist [skip ci]" || exit 0
+            git push
+          else
+            echo "No changes in dist/power-flow-card-plus.js to commit"
+          fi
