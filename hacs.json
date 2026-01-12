@@ -1,5 +1,5 @@
 {
-  "name": "Power Flow Card Plus - Tilton53",
+  "name": power-flow-card-plus-tilton53",
   "render_readme": true,
   "homeassistant": "2023.12.3",
   "filename": "dist/power-flow-card-plus.js"
