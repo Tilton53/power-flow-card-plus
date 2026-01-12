@@ -1,4 +1,4 @@
-Aimport { TemplateResult } from "lit";
+import { TemplateResult } from "lit";
 import { ActionConfig } from "custom-card-helpers";
 
 export type ComboEntity = {
