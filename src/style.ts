@@ -168,23 +168,17 @@ export const styles = css`
 
   /* dedicated spacing for individual rows */
   .top-individuals-row {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
   .bottom-individuals-row {
-    margin-top: 8px;
+    margin-top: 12px;
   }
 
   /* legacy extra-individual styles no longer used */
-  .extra-individuals-row {
-    display: none;
-  }
-  .extra-individuals-column {
-    display: none;
-  }
-  .extra-individual {
-    display: none;
-  }
+  .extra-individuals-row,
+  .extra-individuals-column,
+  .extra-individual,
   .extra-individual-value {
     display: none;
   }
@@ -194,6 +188,26 @@ export const styles = css`
     flex-direction: column;
     align-items: center;
     position: relative;
+  }
+
+  /* generic 10-slot individual layout */
+  .individual-slot {
+    width: var(--size-circle-entity);
+  }
+
+  .individual-row-top {
+    /* top row sits naturally above the main cluster */
+  }
+
+  .individual-row-bottom {
+    /* bottom row sits naturally below the main cluster */
+  }
+
+  .slot-main-flow {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .circle-container.solar {
     height: 130px;
@@ -215,32 +229,10 @@ export const styles = css`
   }
 
   .downstream-list {
-    position: absolute;
+    margin-top: 4px;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    z-index: 3;
-  }
-
-  /* Position downstream clusters around their parent individual */
-  .circle-container.individual-top:not(.individual-right) .downstream-list {
-    left: -90px;
-    top: -10px;
-  }
-
-  .circle-container.individual-bottom:not(.individual-right) .downstream-list {
-    left: -90px;
-    bottom: -10px;
-  }
-
-  .circle-container.individual-right.individual-top .downstream-list {
-    right: -90px;
-    top: -10px;
-  }
-
-  .circle-container.individual-right.individual-bottom .downstream-list {
-    right: -90px;
-    bottom: -10px;
   }
 
   .downstream-item {
