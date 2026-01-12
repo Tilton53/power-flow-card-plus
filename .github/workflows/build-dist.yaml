@@ -42,12 +42,16 @@ jobs:
 
       - name: Commit dist bundle if changed
         run: |
-          if git status --porcelain | grep -q "dist/power-flow-card-plus.js"; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f dist/power-flow-card-plus.js ]; then
             git add -f dist/power-flow-card-plus.js
-            git commit -m "chore: build dist [skip ci]" || exit 0
-            git push
+            if git diff --cached --quiet; then
+              echo "No changes in dist/power-flow-card-plus.js to commit"
+            else
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git commit -m "chore: build dist [skip ci]" || exit 0
+              git push
+            fi
           else
-            echo "No changes in dist/power-flow-card-plus.js to commit"
+            echo "dist/power-flow-card-plus.js does not exist; skipping commit"
           fi
