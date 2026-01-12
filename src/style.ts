@@ -165,6 +165,32 @@ export const styles = css`
     max-width: 500px;
     margin: 0 auto;
   }
+
+  .extra-individuals-row {
+    margin-top: 8px;
+    align-items: flex-start;
+  }
+
+  .extra-individuals-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 140px;
+    overflow-y: auto;
+    padding: 0 2px;
+  }
+
+  .extra-individual {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .extra-individual-value {
+    font-size: 12px;
+    color: var(--secondary-text-color);
+  }
+
   .circle-container {
     display: flex;
     flex-direction: column;
@@ -187,6 +213,35 @@ export const styles = css`
   .circle-container.battery {
     height: 110px;
     justify-content: flex-end;
+  }
+
+  .downstream-list {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .downstream-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .downstream-label {
+    color: var(--secondary-text-color);
+    font-size: 11px;
+    max-width: 72px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-height: 16px;
+  }
+  .downstream-circle {
+    width: 64px;
+    height: 64px;
+    margin-top: 2px;
+  }
+  .downstream-value {
+    font-size: 11px;
   }
   .spacer {
     width: var(--size-circle-entity);

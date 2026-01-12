@@ -571,6 +571,9 @@ export class PowerFlowCardPlus extends LitElement {
     const individualFieldRightTop = getTopRightIndividual(sortedIndividualObjects);
     const individualFieldRightBottom = getBottomRightIndividual(sortedIndividualObjects);
 
+    const visibleIndividuals = sortedIndividualObjects.filter((individual) => individual.has);
+    const extraIndividuals = visibleIndividuals.slice(4);
+
     return html`
       <ha-card
         .header=${this._config.title}
@@ -671,6 +674,31 @@ export class PowerFlowCardPlus extends LitElement {
                   : html``}
               </div>`
             : html`<div class="spacer"></div>`}
+          ${extraIndividuals.length
+            ? html`<div class="row extra-individuals-row">
+                <div class="extra-individuals-column">
+                  ${extraIndividuals.map((individual, index) =>
+                    index % 2 === 0
+                      ? html`<div class="extra-individual">
+                          <span class="label">${individual.name}</span>
+                          <span class="extra-individual-value">${getIndividualDisplayState(individual)}</span>
+                        </div>`
+                      : ""
+                  )}
+                </div>
+                <div class="spacer"></div>
+                <div class="extra-individuals-column">
+                  ${extraIndividuals.map((individual, index) =>
+                    index % 2 === 1
+                      ? html`<div class="extra-individual">
+                          <span class="label">${individual.name}</span>
+                          <span class="extra-individual-value">${getIndividualDisplayState(individual)}</span>
+                        </div>`
+                      : ""
+                  )}
+                </div>
+              </div>`
+            : html``}
           ${flowElement(this._config, {
             battery,
             grid,

@@ -3,6 +3,8 @@ import { IndividualDeviceType } from "@/type";
 import { computeFieldIcon, computeFieldName } from "@/utils/computeFieldAttributes";
 import { getIndividualSecondaryState, getIndividualState } from ".";
 import { hasIndividualObject } from "./hasIndividualObject";
+import { getEntityStateWatts } from "@/states/utils/getEntityStateWatts";
+import { getEntityState } from "@/states/utils/getEntityState";
 
 const fallbackIndividualObject: IndividualObject = {
   field: undefined,
@@ -31,6 +33,7 @@ const fallbackIndividualObject: IndividualObject = {
     displayZeroTolerance: 0,
     decimals: null,
   },
+  downstream: [],
 };
 
 export type IndividualObject = {
@@ -62,6 +65,14 @@ export type IndividualObject = {
     decimals: number | null;
     tap_action?: ActionConfig;
   };
+  downstream: {
+    entity: string;
+    name: string;
+    state: number | string | null;
+    unit?: string;
+    unit_white_space: boolean;
+    decimals?: number;
+  }[];
 };
 
 export const getIndividualObject = (hass: HomeAssistant, field: IndividualDeviceType | undefined): IndividualObject => {
@@ -75,6 +86,30 @@ export const getIndividualObject = (hass: HomeAssistant, field: IndividualDevice
   const userConfiguredInvertAnimation = field?.inverted_animation || false;
   const invertAnimation = isStateNegative ? !userConfiguredInvertAnimation : userConfiguredInvertAnimation;
   const color = field?.color && typeof field?.color === "string" ? field?.color : null;
+
+  const downstream =
+    field.downstream?.map((down) => {
+      const entityId = down.entity;
+      const watts = getEntityStateWatts(hass, entityId);
+      const hasNumeric = watts !== null && !Number.isNaN(watts as number);
+      const rawState = hasNumeric ? watts : getEntityState(hass, entityId);
+      const entityObj = hass.states[entityId];
+      const name = down.name || entityObj?.attributes?.friendly_name || entityId;
+      const unit =
+        down.unit_of_measurement ||
+        (typeof entityObj?.attributes?.unit_of_measurement === "string"
+          ? (entityObj.attributes.unit_of_measurement as string)
+          : undefined);
+
+      return {
+        entity: entityId,
+        name,
+        state: rawState ?? null,
+        unit,
+        unit_white_space: down.unit_white_space !== false,
+        decimals: down.decimals,
+      };
+    }) ?? [];
 
   return {
     field,
@@ -105,5 +140,6 @@ export const getIndividualObject = (hass: HomeAssistant, field: IndividualDevice
       decimals: field?.secondary_info?.decimals || null,
       tap_action: field?.secondary_info?.tap_action,
     },
+    downstream,
   };
 };

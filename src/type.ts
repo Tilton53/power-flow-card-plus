@@ -1,4 +1,4 @@
-import { TemplateResult } from "lit";
+Aimport { TemplateResult } from "lit";
 import { ActionConfig } from "custom-card-helpers";
 
 export type ComboEntity = {
@@ -44,6 +44,14 @@ export type GridPowerOutage = {
   entity_generator?: string;
 };
 
+export type IndividualDownstreamDeviceType = {
+  entity: string;
+  name?: string;
+  unit_of_measurement?: string;
+  unit_white_space?: boolean;
+  decimals?: number;
+};
+
 export type IndividualDeviceType = BaseConfigEntity & {
   entity: string;
   color?: string;
@@ -57,6 +65,7 @@ export type IndividualDeviceType = BaseConfigEntity & {
   use_metadata?: boolean;
   decimals?: number;
   show_direction?: boolean;
+  downstream?: IndividualDownstreamDeviceType[];
 };
 
 export type EntityType = "battery" | "grid" | "solar" | "individual1" | "individual2" | "home" | "fossil_fuel_percentage";

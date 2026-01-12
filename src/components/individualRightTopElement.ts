@@ -9,6 +9,7 @@ import { PowerFlowCardPlus } from "../power-flow-card-plus";
 import { styleLine } from "../utils/styleLine";
 import { checkHasBottomIndividual } from "../utils/computeIndividualPosition";
 import { checkShouldShowDots } from "../utils/checkShouldShowDots";
+import { displayValue } from "../utils/displayValue";
 
 interface TopIndividual {
   newDur: NewDur;
@@ -83,10 +84,46 @@ export const individualRightTopElement = (
                     <mpath xlink:href="#individual-top-right-home" />
                     </animateMotion>
                     </circle>`
-                : ""}
-            </svg>
-          </div>
-        `
-      : ""}
-  </div>`;
+               : ""}
+           </svg>
+         </div>
+       `
+     : ""}
+
+   ${individualObj.downstream && individualObj.downstream.length
+     ? html`<div class="downstream-list">
+         ${individualObj.downstream.map((down) => {
+           const downstreamDisplay =
+             down.state !== null && down.state !== undefined
+               ? displayValue(main.hass, config, down.state as any, {
+                   unit: down.unit,
+                   unitWhiteSpace: down.unit_white_space,
+                   decimals: down.decimals,
+                   watt_threshold: config.watt_threshold,
+                 })
+               : "";
+           const power = typeof down.state === "number" ? down.state : 0;
+           const icon =
+             (main.hass.states[down.entity]?.attributes?.icon as string | undefined) || individualObj.icon || "mdi:flash";
+           return html`<div class="downstream-item">
+             <span class="label downstream-label">${down.name}</span>
+             <div
+               class="circle downstream-circle"
+               @click=${(e: { stopPropagation: () => void; target: HTMLElement }) => {
+                 main.openDetails(e, undefined, down.entity);
+               }}
+             >
+               ${icon ? html`<ha-icon .icon=${icon}></ha-icon>` : null}
+               ${downstreamDisplay ? html`<span class="downstream-value">${downstreamDisplay}</span>` : ""}
+             </div>
+             ${showLine(config, power) && !config.entities.home?.hide
+               ? html`<svg width="80" height="30">
+                   <path d="M40 40 v-40" class="${styleLine(power, config)} downstream-line" />
+                 </svg>`
+               : ""}
+           </div>`;
+         })}
+       </div>`
+     : ""}
+ </div>`;
 };
