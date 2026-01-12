@@ -7,10 +7,7 @@ import { batteryElement } from "./components/battery";
 import { flowElement } from "./components/flows";
 import { gridElement } from "./components/grid";
 import { homeElement } from "./components/home";
-import { individualLeftBottomElement } from "./components/individualLeftBottomElement";
-import { individualLeftTopElement } from "./components/individualLeftTopElement";
-import { individualRightBottomElement } from "./components/individualRightBottomElement";
-import { individualRightTopElement } from "./components/individualRightTopElement";
+import { individualSlotElement } from "./components/individualSlotElement";
 import { dashboardLinkElement } from "./components/misc/dashboard_link";
 import { nonFossilElement } from "./components/nonFossil";
 import { solarElement } from "./components/solar";
@@ -32,14 +29,7 @@ import { RenderTemplateResult, subscribeRenderTemplate } from "./template/ha-web
 import { GridObject, HomeSources, NewDur, TemplatesObj } from "./type";
 import { computeFieldIcon, computeFieldName } from "./utils/computeFieldAttributes";
 import { computeFlowRate } from "./utils/computeFlowRate";
-import {
-  checkHasBottomIndividual,
-  checkHasRightIndividual,
-  getBottomLeftIndividual,
-  getBottomRightIndividual,
-  getTopLeftIndividual,
-  getTopRightIndividual,
-} from "./utils/computeIndividualPosition";
+import { checkHasBottomIndividual, checkHasRightIndividual, getBottomRowIndividuals, getTopRowIndividuals } from "./utils/computeIndividualPosition";
 import { displayValue } from "./utils/displayValue";
 import { defaultValues, getDefaultConfig } from "./utils/get-default-config";
 import { registerCustomCard } from "./utils/register-custom-card";
@@ -566,10 +556,8 @@ export class PowerFlowCardPlus extends LitElement {
 
     const sortedIndividualObjects = this._config.sort_individual_devices ? sortIndividualObjects(individualObjs) : individualObjs;
 
-    const individualFieldLeftTop = getTopLeftIndividual(sortedIndividualObjects);
-    const individualFieldLeftBottom = getBottomLeftIndividual(sortedIndividualObjects);
-    const individualFieldRightTop = getTopRightIndividual(sortedIndividualObjects);
-    const individualFieldRightBottom = getBottomRightIndividual(sortedIndividualObjects);
+    const bottomRowIndividuals = getBottomRowIndividuals(sortedIndividualObjects);
+    const topRowIndividuals = getTopRowIndividuals(sortedIndividualObjects);
 
     return html`
       <ha-card
@@ -582,27 +570,18 @@ export class PowerFlowCardPlus extends LitElement {
           id="power-flow-card-plus"
           style=${this._config.style_card_content ? this._config.style_card_content : ""}
         >
-          ${individualFieldLeftTop || individualFieldRightTop
+          ${topRowIndividuals.length
             ? html`<div class="row top-individuals-row">
-                ${individualFieldLeftTop
-                  ? individualLeftTopElement(this, this._config, {
-                      individualObj: individualFieldLeftTop,
-                      displayState: getIndividualDisplayState(individualFieldLeftTop),
-                      newDur,
-                      templatesObj,
-                    })
-                  : html`<div class="spacer"></div>`}
-                <div class="spacer"></div>
-                ${checkHasRightIndividual(individualObjs)
-                  ? individualRightTopElement(this, this._config, {
-                      displayState: getIndividualDisplayState(individualFieldRightTop),
-                      individualObj: individualFieldRightTop,
-                      newDur,
-                      templatesObj,
-                      battery,
-                      individualObjs,
-                    })
-                  : html`<div class="spacer"></div>`}
+                ${topRowIndividuals.map((individual, index) =>
+                  individualSlotElement(this, this._config, {
+                    individualObj: individual,
+                    displayState: getIndividualDisplayState(individual),
+                    newDur,
+                    templatesObj,
+                    row: "top",
+                    index,
+                  })
+                )}
               </div>`
             : html``}
           ${(solar.has || nonFossil.hasPercentage) &&
@@ -659,27 +638,18 @@ export class PowerFlowCardPlus extends LitElement {
                 <div class="spacer"></div>
               </div>`
             : html``}
-          ${checkHasBottomIndividual(individualObjs)
+          ${bottomRowIndividuals.length
             ? html`<div class="row bottom-individuals-row">
-                ${individualFieldLeftBottom
-                  ? individualLeftBottomElement(this, this._config, {
-                      displayState: getIndividualDisplayState(individualFieldLeftBottom),
-                      individualObj: individualFieldLeftBottom,
-                      newDur,
-                      templatesObj,
-                    })
-                  : html`<div class="spacer"></div>`}
-                <div class="spacer"></div>
-                ${checkHasRightIndividual(individualObjs)
-                  ? individualRightBottomElement(this, this._config, {
-                      displayState: getIndividualDisplayState(individualFieldRightBottom),
-                      individualObj: individualFieldRightBottom,
-                      newDur,
-                      templatesObj,
-                      battery,
-                      individualObjs,
-                    })
-                  : html`<div class="spacer"></div>`}
+                ${bottomRowIndividuals.map((individual, index) =>
+                  individualSlotElement(this, this._config, {
+                    individualObj: individual,
+                    displayState: getIndividualDisplayState(individual),
+                    newDur,
+                    templatesObj,
+                    row: "bottom",
+                    index,
+                  })
+                )}
               </div>`
             : html``}
           ${flowElement(this._config, {
